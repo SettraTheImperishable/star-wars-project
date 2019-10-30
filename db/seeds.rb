@@ -17,14 +17,50 @@ Species.destroy_all
 Character.destroy_all
 Planet.destroy_all
 
+# grabs all the planets, loops through each page url
 response = Swapi.get_all 'planets'
 planets = JSON.parse(response)
-count = planets['count']
-i = 1
+planet_list = planets['results']
+isNextPage = true
 
-while i <= count
-  response = Swapi.get_planet i
-  planet = JSON.parse(response)
+while isNextPage
+  uri = URI(planets['next'])
+  response = Net::HTTP.get(uri)
+  planets = JSON.parse(response)
+  planet_list += planets['results']
+
+  break if planets['next'].nil?
+end
+
+# grabs all starships, loops through each page url
+response = Swapi.get_all 'starships'
+starships = JSON.parse(response)
+starship_list = starships['results']
+
+while isNextPage
+  uri = URI(starships['next'])
+  response = Net::HTTP.get(uri)
+  starships = JSON.parse(response)
+  starship_list += starships['results']
+
+  break if starships['next'].nil?
+end
+
+# grabs all species, loops through each page url
+response = Swapi.get_all 'species'
+species = JSON.parse(response)
+species_list = species['results']
+
+while isNextPage
+  uri = URI(species['next'])
+  response = Net::HTTP.get(uri)
+  species = JSON.parse(response)
+  species_list += species['results']
+
+  break if species['next'].nil?
+end
+
+planet_list.each do |planet|
   Planet.create(
     name: planet['name'],
     rotation_period: planet['rotation_period'],
@@ -36,25 +72,9 @@ while i <= count
     surface_water: planet['surface_water'],
     population: planet['population']
   )
-  i += 1
 end
 
-# seeds Starship data
-response = Swapi.get_all 'starships'
-starships = JSON.parse(response)
-starship_list = starships['results']
-isNextPage = true
-
-while isNextPage
-  url = starships['next']
-  uri = URI(url)
-  response = Net::HTTP.get(uri)
-  starships = JSON.parse(response)
-  starship_list += starships['results']
-
-  break if starships['next'].nil?
-end
-
+# creates all Starship data
 starship_list.each do |starship|
   Starship.create(
     name: starship['name'],
@@ -71,6 +91,27 @@ starship_list.each do |starship|
     MGLT: starship['MGLT'],
     starship_class: starship['starship_class']
   )
+end
+
+species_list.each do |specy|
+  uri = URI(specy['homeworld'])
+  response = Net::HTTP.get(uri)
+  planet = JSON.parse(response)
+
+  homeworld = Planet.find_by name: planet['name']
+
+  homeworld.species
+           .build(
+             # name: specy['name']
+             classification: specy['classification'],
+             designation: specy['designation'],
+             average_height: specy['average_height'],
+             skin_colors: specy['skin_colors'],
+             hair_colors: specy['hair_colors'],
+             eye_colors: specy['eye_colors'],
+             average_lifespan: specy['average_lifespan'],
+             language: specy['language']
+           ).save
 end
 
 # response = Swapi.get_all 'people'

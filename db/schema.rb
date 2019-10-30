@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_050039) do
+ActiveRecord::Schema.define(version: 2019_10_30_194437) do
 
   create_table "character_species", force: :cascade do |t|
     t.integer "character_id", null: false
@@ -70,6 +70,8 @@ ActiveRecord::Schema.define(version: 2019_10_30_050039) do
     t.integer "planet_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name"
+    t.string "language"
     t.index ["planet_id"], name: "index_species_on_planet_id"
   end
 
