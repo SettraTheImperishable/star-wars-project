@@ -94,24 +94,38 @@ starship_list.each do |starship|
 end
 
 species_list.each do |specy|
-  uri = URI(specy['homeworld'])
-  response = Net::HTTP.get(uri)
-  planet = JSON.parse(response)
+  if specy['homeworld'].nil?
+    Species.create(
+      name: specy['name'],
+      classification: specy['classification'],
+      designation: specy['designation'],
+      average_height: specy['average_height'],
+      skin_colors: specy['skin_colors'],
+      hair_colors: specy['hair_colors'],
+      eye_colors: specy['eye_colors'],
+      average_lifespan: specy['average_lifespan'],
+      language: specy['language']
+    )
+  else
+    uri = URI(specy['homeworld'])
+    response = Net::HTTP.get(uri)
+    planet = JSON.parse(response)
 
-  homeworld = Planet.find_by name: planet['name']
+    homeworld = Planet.find_by name: planet['name']
 
-  homeworld.species
-           .build(
-             # name: specy['name']
-             classification: specy['classification'],
-             designation: specy['designation'],
-             average_height: specy['average_height'],
-             skin_colors: specy['skin_colors'],
-             hair_colors: specy['hair_colors'],
-             eye_colors: specy['eye_colors'],
-             average_lifespan: specy['average_lifespan'],
-             language: specy['language']
-           ).save
+    homeworld.species
+             .build(
+               name: specy['name'],
+               classification: specy['classification'],
+               designation: specy['designation'],
+               average_height: specy['average_height'],
+               skin_colors: specy['skin_colors'],
+               hair_colors: specy['hair_colors'],
+               eye_colors: specy['eye_colors'],
+               average_lifespan: specy['average_lifespan'],
+               language: specy['language']
+             ).save
+  end
 end
 
 # response = Swapi.get_all 'people'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_194437) do
+ActiveRecord::Schema.define(version: 2019_10_30_202328) do
 
   create_table "character_species", force: :cascade do |t|
     t.integer "character_id", null: false
@@ -67,7 +67,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_194437) do
     t.string "eye_colors"
     t.string "hair_colors"
     t.string "skin_colors"
-    t.integer "planet_id", null: false
+    t.integer "planet_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "name"
