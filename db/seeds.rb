@@ -19,10 +19,10 @@ Planet.destroy_all
 
 response = Swapi.get_all 'planets'
 planets = JSON.parse(response)
-planet_count = planets['count']
+count = planets['count']
 i = 1
 
-while i <= planet_count
+while i <= count
   response = Swapi.get_planet i
   planet = JSON.parse(response)
   Planet.create(
@@ -38,3 +38,52 @@ while i <= planet_count
   )
   i += 1
 end
+
+# seeds Starship data
+response = Swapi.get_all 'starships'
+starships = JSON.parse(response)
+starship_list = starships['results']
+isNextPage = true
+
+while isNextPage
+  url = starships['next']
+  uri = URI(url)
+  response = Net::HTTP.get(uri)
+  starships = JSON.parse(response)
+  starship_list += starships['results']
+
+  break if starships['next'].nil?
+end
+
+starship_list.each do |starship|
+  Starship.create(
+    name: starship['name'],
+    model: starship['mode;'],
+    manufacturer: starship['manufacturer'],
+    credit_cost: starship['cost_in_Credits'],
+    length: starship['length'],
+    max_atmosphere_speed: starship['max_atmosphering_speed'],
+    crew: starship['crew'],
+    passengers: starship['passengers'],
+    cargo_capacity: starship['cargo_capacity'],
+    consumables: starship['consumables'],
+    hyperdrive_rating: starship['hyperdrive_rating'],
+    MGLT: starship['MGLT'],
+    starship_class: starship['starship_class']
+  )
+end
+
+# response = Swapi.get_all 'people'
+# people = JSON.parse(response)
+# count = people['count']
+# i = 1
+
+# while i <= count
+#   response = Swapi.get_person i
+#   character = JSON.parse(response)
+#   Character.create(
+#     name: character['name'],
+
+#   )
+#   i += 1
+# end
